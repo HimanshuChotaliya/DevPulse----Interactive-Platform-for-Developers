@@ -94,6 +94,7 @@ app.get("/", async (req,res) => {
 } )
 
 const startServer = async () => {
+    console.log('DB URL:', process.env.DATABASE_URL);
     // 1. Create/verify database tables sequentially to satisfy foreign key constraints
     try {
         await createUserTable();
