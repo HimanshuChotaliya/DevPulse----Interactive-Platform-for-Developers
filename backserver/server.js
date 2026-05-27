@@ -1,3 +1,8 @@
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('verbatim');
+}
+
 const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
