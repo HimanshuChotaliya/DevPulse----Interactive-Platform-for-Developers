@@ -78,14 +78,6 @@ app.use('/api/presence', authMiddleware, presenceRoutes)
 // Error handling Middleware is moved to the end
 
 
-// Create table before starting 
-createUserTable();
-createPostTable();
-createCommentTable();
-createUpvoteTable();
-createPresenceTable();
-
-
 // Testing db connection
 app.get("/", async (req,res) => {
     console.log("Start")
@@ -95,6 +87,18 @@ app.get("/", async (req,res) => {
 } )
 
 const startServer = async () => {
+    // 1. Create/verify database tables sequentially to satisfy foreign key constraints
+    try {
+        await createUserTable();
+        await createPostTable();
+        await createCommentTable();
+        await createUpvoteTable();
+        await createPresenceTable();
+        console.log("Database tables verified/created sequentially ✅");
+    } catch (err) {
+        console.error("Critical: Database table creation failed:", err);
+    }
+
     await connectRedis();
 
     setupWebSocket(server);
