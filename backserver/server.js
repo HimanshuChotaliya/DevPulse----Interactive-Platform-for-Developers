@@ -36,7 +36,7 @@ dotenv.config()
 const app = express()
 const server = http.createServer(app)   
 
-const port = process.env.PORT || 3005;
+const port = process.env.PORT || 5000;
 
 // Middlewares
 app.use(express.urlencoded({extended: true}))

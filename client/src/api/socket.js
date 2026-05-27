@@ -19,7 +19,7 @@ export const connectSocket = () => {
     ws.close();
   }
 
-  const wsUrl = `ws://localhost:3005?token=${token || ''}&user_id=${user.id}`;
+  const wsUrl = `ws://localhost:5000?token=${token || ''}&user_id=${user.id}`;
   console.log("[WebSocket] Connecting to", wsUrl);
 
   ws = new WebSocket(wsUrl);

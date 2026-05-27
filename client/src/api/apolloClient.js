@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, concat } from '@apol
 import useAuthStore from '../store/authStore';
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:3005/graphql',
+  uri: 'http://localhost:5000/graphql',
 });
 
 // Middleware to append headers (JWT Token) automatically
