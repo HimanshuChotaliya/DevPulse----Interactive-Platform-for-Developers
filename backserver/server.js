@@ -48,15 +48,19 @@ const port = process.env.PORT || 5000;
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 app.use(cookieParser())
+const allowedOrigins = [
+  'https://dev-pulse-interactive-platform-for.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175'
+];
+
 app.use(cors({
   origin: (origin, callback) => {
-    const allowed = [
-      'https://dev-pulse-interactive-platform-for.vercel.app',
-    ];
-    if (!origin || allowed.includes(origin) || origin.endsWith('.vercel.app')) {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app') || origin.startsWith('http://localhost:')) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
   credentials: true
@@ -64,10 +68,10 @@ app.use(cors({
 
 app.options(/.*/, cors({
   origin: (origin, callback) => {
-    if (!origin || origin.endsWith('.vercel.app')) {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app') || origin.startsWith('http://localhost:')) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
   credentials: true

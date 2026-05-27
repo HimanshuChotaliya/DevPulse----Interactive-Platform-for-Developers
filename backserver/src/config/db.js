@@ -4,10 +4,13 @@ const path = require("path")
 
 dotenv.config({ path: path.resolve(__dirname, "../../.env") })
 
+const isInternalRailway = process.env.DATABASE_URL && process.env.DATABASE_URL.includes("railway.internal");
+
 const pool = new Pool(
     process.env.DATABASE_URL
         ? {
             connectionString: process.env.DATABASE_URL,
+            ssl: isInternalRailway ? false : { rejectUnauthorized: false }
         }
         : {
             host: process.env.DB_HOST || "localhost",
