@@ -48,29 +48,14 @@ const port = process.env.PORT || 5000;
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 app.use(cookieParser())
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:5175",
-  "https://dev-pulse-interactive-platform-for.vercel.app",
-  process.env.CLIENT_URL
-].filter(Boolean);
-
-const corsOptions = {
-    origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith("http://localhost:")) {
-            return callback(null, true);
-        }
-        return callback(new Error("CORS policy violation"), false);
-    },
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    credentials: true
-};
-
-app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions)); // Handle OPTIONS preflight explicitly for all routes in Express 5 using a regex literal
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
+app.options(/.*/, cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
 
 // Routes
 const authMiddleware = require('./src/middlewares/auth.js')
