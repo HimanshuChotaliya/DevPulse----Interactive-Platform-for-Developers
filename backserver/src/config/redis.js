@@ -1,11 +1,10 @@
-// server/src/config/redis.js
+// backserver/src/config/redis.js
 const redis = require("redis")
 
 const clientConfig = {
+  url: process.env.REDIS_URL || "redis://localhost:6379",
   socket: {
-    port: process.env.REDIS_PORT || 6379,
-    host: process.env.REDIS_HOST || "localhost",
-    reconnectStrategy: () => false // Disable auto-reconnect to avoid infinite ECONNREFUSED loops if Redis is offline
+    reconnectStrategy: () => false
   }
 }
 
@@ -13,9 +12,9 @@ const redisClient = redis.createClient(clientConfig)
 const redisPublisher = redis.createClient(clientConfig)
 const redisSubscriber = redis.createClient(clientConfig)
 
-redisClient.on("error", (err) => console.log("Redis client error: Connection refused (running without Redis cache)"))
-redisPublisher.on("error", (err) => console.log("Redis publisher error: Connection refused (running without Redis cache)"))
-redisSubscriber.on("error", (err) => console.log("Redis subscriber error: Connection refused (running without Redis cache)"))
+redisClient.on("error", () => console.log("Redis client error: running without Redis cache"))
+redisPublisher.on("error", () => console.log("Redis publisher error: running without Redis cache"))
+redisSubscriber.on("error", () => console.log("Redis subscriber error: running without Redis cache"))
 
 const safeClient = {
   get: async (key) => {
@@ -53,10 +52,7 @@ const safeClient = {
 
 const safePublisher = {
   publish: async (channel, message) => {
-    if (!redisPublisher.isOpen || !redisPublisher.isReady) {
-      // Gracefully do nothing or log a debug warning if offline
-      return
-    }
+    if (!redisPublisher.isOpen || !redisPublisher.isReady) return
     try {
       return await redisPublisher.publish(channel, message)
     } catch (e) {
