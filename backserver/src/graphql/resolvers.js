@@ -80,6 +80,11 @@ const resolvers = {
             const upvotes = await getUpvoteByPostIdService(parent.id);
             return upvotes.map(u => u.user_id);
         }
+    },
+    Comment: {
+        author: async (parent) => {
+            return await getUserByIdService(parent.user_id);
+        }
     }
 }
 

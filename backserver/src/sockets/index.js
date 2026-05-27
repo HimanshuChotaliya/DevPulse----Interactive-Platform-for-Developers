@@ -12,7 +12,7 @@ const getUserIdFromRequest = (req) => {
     const tokenParam = url.searchParams.get("token");
     if (tokenParam && tokenParam !== 'null' && tokenParam !== 'undefined' && tokenParam !== '') {
       try {
-        const decoded = jwt.verify(tokenParam, process.env.JWT_SECRET || 'my_super_secret_key');
+        const decoded = jwt.verify(tokenParam, process.env.JWT_SECRET);
         if (decoded && decoded.id) return decoded.id;
       } catch (err) {
         console.warn("WS auth failed for token query param:", err.message);
@@ -35,7 +35,7 @@ const getUserIdFromRequest = (req) => {
       );
       if (cookies.token && cookies.token !== 'null' && cookies.token !== 'undefined' && cookies.token !== '') {
         try {
-          const decoded = jwt.verify(cookies.token, process.env.JWT_SECRET || 'my_super_secret_key');
+          const decoded = jwt.verify(cookies.token, process.env.JWT_SECRET);
           if (decoded && decoded.id) return decoded.id;
         } catch (err) {
           console.warn("WS auth failed for cookie token:", err.message);
@@ -68,6 +68,12 @@ const setupWebSocket = (server) => {
     })
   } else {
     console.warn("⚠️ Warning: Redis is offline. WS multi-node sync disabled (running in single-instance mode).")
+    
+    // Local fallback: Listen to local Event Emitter for single-instance WebSockets
+    const sysEvents = require("../utils/eventEmitter")
+    sysEvents.on("ws_event", (message) => {
+      broadcast(clients, message)
+    })
   }
 
   wss.on("connection", async (ws, req) => {

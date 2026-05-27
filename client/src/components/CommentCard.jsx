@@ -6,6 +6,7 @@ import { CheckCircle2, MoreVertical, Pencil, Trash2, X, Check } from 'lucide-rea
 import useAuthStore from '../store/authStore';
 import api from '../api/axios.js';
 import toast from 'react-hot-toast';
+import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
 export default function CommentCard({ comment, onMarkSolution, onRefresh, postId }) {
   const user = useAuthStore((s) => s.user);
@@ -90,8 +91,9 @@ export default function CommentCard({ comment, onMarkSolution, onRefresh, postId
       }`}
     >
       <img
-        src={author.avatar_img || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'}
+        src={getAvatarUrl(author.avatar_img, author.name)}
         alt={author.name}
+        onError={(e) => handleAvatarError(e, author.name)}
         className="w-9 h-9 rounded-full object-cover bg-gray-200 flex-shrink-0"
       />
       

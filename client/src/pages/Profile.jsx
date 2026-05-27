@@ -6,10 +6,10 @@ import { ArrowLeft, Calendar, Briefcase, Grid, Pencil, Check, X, Camera } from '
 import { useQuery } from '@apollo/client/react';
 import { gql } from '@apollo/client';
 import PostCard from '../components/PostCard';
-import ActivityHeatmap from '../components/ActivityHeatmap';
 import useAuthStore from '../store/authStore';
 import api from '../api/axios.js';
 import toast from 'react-hot-toast';
+import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
 const FILTER_TABS = ['All', 'Updates', 'Questions', 'Decisions', 'Blockers'];
 const FILTER_MAP = { All: null, Updates: 'update', Questions: 'question', Decisions: 'decision', Blockers: 'blocker' };
@@ -64,8 +64,25 @@ export default function Profile() {
 
   const { data, loading, error, refetch } = useQuery(GET_PROFILE, {
     variables: { id: userId },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
   });
+
+  // Force refetch on mount or when userId changes
+  useEffect(() => {
+    refetch();
+  }, [userId, refetch]);
+
+  // Real-time synchronization: listen for WebSocket post events to auto-refresh heatmap
+  useEffect(() => {
+    function handleWSEvent(e) {
+      const { type } = e.detail || {};
+      if (type === 'NEW_POST' || type === 'UPDATED_POST' || type === 'DELETED_POST') {
+        refetch();
+      }
+    }
+    window.addEventListener('devpulse_ws_event', handleWSEvent);
+    return () => window.removeEventListener('devpulse_ws_event', handleWSEvent);
+  }, [refetch]);
 
   useEffect(() => {
     if (data?.getUser) {
@@ -167,10 +184,10 @@ export default function Profile() {
           <div className="flex items-end justify-between -mt-14 mb-4">
             <div className="relative group">
               <img
-                src={editing ? (editForm.avatar_img || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileUser.name}`) : (profileUser.avatar_img || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileUser.name}`)}
+                src={getAvatarUrl(editing ? editForm.avatar_img : profileUser.avatar_img, editing ? editForm.name : profileUser.name)}
                 alt={profileUser.name}
                 className="w-24 h-24 rounded-2xl border-4 border-white dark:border-gray-900 object-cover bg-gray-200 shadow-lg"
-                onError={(e) => { e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileUser.name}` }}
+                onError={(e) => handleAvatarError(e, editing ? editForm.name : profileUser.name)}
               />
               {editing && (
                 <div className="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center">
@@ -277,10 +294,6 @@ export default function Profile() {
         </div>
       </motion.div>
 
-      {/* Activity Heatmap */}
-      <div className="mb-6">
-        <ActivityHeatmap userId={profileUser.id} />
-      </div>
 
       {/* Post History */}
       <div>

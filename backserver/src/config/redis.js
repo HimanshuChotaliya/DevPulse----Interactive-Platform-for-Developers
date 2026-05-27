@@ -52,11 +52,21 @@ const safeClient = {
 
 const safePublisher = {
   publish: async (channel, message) => {
-    if (!redisPublisher.isOpen || !redisPublisher.isReady) return
+    // 1. If Redis is ONLINE, publish to Redis channel.
+    if (redisPublisher.isOpen && redisPublisher.isReady) {
+      try {
+        return await redisPublisher.publish(channel, message)
+      } catch (e) {
+        console.error("[Redis Publisher] Publish error:", e)
+      }
+    }
+    
+    // 2. If Redis is OFFLINE, route event locally to avoid duplicate broadcasts
     try {
-      return await redisPublisher.publish(channel, message)
+      const sysEvents = require("../utils/eventEmitter.js")
+      sysEvents.emit("ws_event", JSON.parse(message))
     } catch (e) {
-      console.error("[Redis Publisher] Publish error:", e)
+      console.error("[Local Event Bus] Failed to emit local ws_event:", e)
     }
   }
 }

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Rss, User, Users, X } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useUserStore from '../store/userStore';
+import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
 export default function BottomNav() {
   const [onlineSheetOpen, setOnlineSheetOpen] = useState(false);
@@ -72,8 +73,9 @@ export default function BottomNav() {
                     >
                       <div className="relative">
                         <img
-                          src={u.avatar_img || u.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'}
+                          src={getAvatarUrl(u.avatar_img || u.avatar, u.name)}
                           alt={u.name}
+                          onError={(e) => handleAvatarError(e, u.name)}
                           className="w-10 h-10 rounded-full bg-gray-200 object-cover"
                         />
                         <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />

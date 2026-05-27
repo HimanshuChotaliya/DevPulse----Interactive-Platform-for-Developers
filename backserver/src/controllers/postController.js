@@ -75,7 +75,7 @@ const getPostbyId = async (req, res, next) => {
         type: "UPDATED_POST",
         payload: updatedPost
         }))
-        if(!updatePost) return handleResponse(res, 404, "Post not found")
+        if(!updatedPost) return handleResponse(res, 404, "Post not found")
         handleResponse(res, 200, "Post updated successfully", updatedPost)
     } catch (error) {
         next(error)

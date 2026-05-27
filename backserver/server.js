@@ -32,7 +32,8 @@ const setupWebSocket = require("./src/sockets")
 const { connectRedis } = require("./src/config/redis")
 
 
-dotenv.config()
+const path = require("path")
+dotenv.config({ path: path.resolve(__dirname, ".env") })
 const app = express()
 const server = http.createServer(app)   
 
@@ -42,16 +43,31 @@ const port = process.env.PORT || 5000;
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 app.use(cookieParser())
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  process.env.CLIENT_URL
+].filter(Boolean);
+
 app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith("http://localhost:")) {
+            return callback(null, true);
+        }
+        return callback(new Error("CORS policy violation"), false);
+    },
     credentials: true
 }))
 
 // Routes
-app.use('/api/users',    userRoutes)
-app.use('/api/auth',     authRoutes)
-app.use('/api/posts',    postRoutes)
-app.use('/api/presence', presenceRoutes)
+const authMiddleware = require('./src/middlewares/auth.js')
+
+app.use('/api/auth',     authRoutes) // Public routes (login & register)
+app.use('/api/users',    authMiddleware, userRoutes)
+app.use('/api/posts',    authMiddleware, postRoutes)
+app.use('/api/presence', authMiddleware, presenceRoutes)
 
 
 // Error handling Middleware is moved to the end
@@ -84,7 +100,7 @@ const startServer = async () => {
     });
     await apolloServer.start();
     
-    app.use('/graphql', express.json(), expressMiddleware(apolloServer));
+    app.use('/graphql', authMiddleware, express.json(), expressMiddleware(apolloServer));
 
     // Error handling Middleware
     app.use(errorhandling);

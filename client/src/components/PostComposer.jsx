@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { Send, Image, X, ChevronDown } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import usePostStore from '../store/postStore';
+import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
 const POST_TYPES = [
   { value: 'update',   label: '🔵 Update',   color: 'text-blue-600' },
@@ -69,8 +70,9 @@ export default function PostComposer() {
       <form onSubmit={handleSubmit} className="p-5">
         <div className="flex gap-3">
           <img
-            src={user?.avatar_img}
+            src={getAvatarUrl(user?.avatar_img, user?.name)}
             alt={user?.name}
+            onError={(e) => handleAvatarError(e, user?.name)}
             className="w-10 h-10 rounded-full object-cover bg-gray-200 flex-shrink-0 self-start mt-0.5"
           />
           <div className="flex-1 min-w-0">

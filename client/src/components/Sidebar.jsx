@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Rss, User, Users } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useUserStore from '../store/userStore';
+import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
 export default function Sidebar() {
   const user = useAuthStore((s) => s.user);
@@ -44,8 +45,9 @@ export default function Sidebar() {
                   >
                     <div className="relative flex-shrink-0">
                       <img
-                        src={u.avatar_img || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'}
+                        src={getAvatarUrl(u.avatar_img, u.name)}
                         alt={u.name}
+                        onError={(e) => handleAvatarError(e, u.name)}
                         className="w-8 h-8 rounded-full bg-gray-200 object-cover"
                       />
                       <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-950" />

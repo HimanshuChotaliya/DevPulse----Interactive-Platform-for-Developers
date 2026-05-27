@@ -6,6 +6,7 @@ import { Zap, User, Mail, Lock, Briefcase, ArrowRight, ChevronDown } from 'lucid
 import { mockRegister } from '../mocks/api.js';
 import useAuthStore from '../store/authStore';
 import api from "../api/axios.js"
+import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
 const ROLES = ['Developer', 'Designer', 'Manager'];
 
@@ -110,15 +111,25 @@ export default function Register() {
             {/* Avatar Image */}
             <div>
               <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Avatar Image URL</label>
-              <div className="relative">
-                <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-                <input
-                  type="text"
-                  value={avatar_img}
-                  onChange={(e) => setAvatarImg(e.target.value)}
-                  placeholder="https://example.com/avatar.jpg"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
-                />
+              <div className="flex gap-3 items-center">
+                <div className="relative flex-shrink-0">
+                  <img
+                    src={getAvatarUrl(avatar_img, name)}
+                    alt="Avatar Preview"
+                    onError={(e) => handleAvatarError(e, name)}
+                    className="w-12 h-12 rounded-2xl border-2 border-white/20 object-cover bg-white/5 shadow-inner"
+                  />
+                </div>
+                <div className="relative flex-grow">
+                  <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    type="text"
+                    value={avatar_img}
+                    onChange={(e) => setAvatarImg(e.target.value)}
+                    placeholder="https://example.com/avatar.jpg"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
+                  />
+                </div>
               </div>
             </div>
 

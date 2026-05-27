@@ -1,4 +1,4 @@
-﻿// Standardized Response function
+// Standardized Response function
 const {getAllUsersService, getUserByIdService, createUserService, updateUserService, updateUserProfileService, deleteUserService, getUserByEmailService} = require('../models/userModel')
 const bcrypt  = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -42,7 +42,7 @@ const getUser = async (req, res, next) => {
                  const newUsers = await createUserService(name, email, hash, avatar_img, role);
                  const token = jwt.sign(
                  { email: newUsers.email, id: newUsers.id }, 
-                 process.env.JWT_SECRET || 'my_super_secret_key', 
+                 process.env.JWT_SECRET, 
                  { expiresIn: '7d' }
              );
 
@@ -77,7 +77,7 @@ const loginUser = async (req, res, next) => {
         // Generate JWT Token
         const token = jwt.sign(
             { email: user.email, id: user.id }, 
-            process.env.JWT_SECRET || 'my_super_secret_key', 
+            process.env.JWT_SECRET, 
             { expiresIn: '7d' }
         );
 
@@ -115,7 +115,7 @@ const updateProfile = async (req, res, next) => {
     const {name, email, password, avatar_img, role,id} = req.body;
     try {
         const updatedUsers = await updateUserService(name, email, password, avatar_img, role, id);
-        if(!updateUser) return handleResponse(res, 404, "User not found")
+        if(!updatedUsers) return handleResponse(res, 404, "User not found")
         handleResponse(res, 200, "Users updated successfully", updatedUsers)
     } catch (error) {
         next(error)

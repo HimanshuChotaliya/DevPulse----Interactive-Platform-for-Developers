@@ -5,6 +5,7 @@ import { Zap, Sun, Moon, User, LogOut, ChevronDown, Wifi, WifiOff, Users } from 
 import useAuthStore from '../store/authStore';
 import useUserStore from '../store/userStore';
 import useThemeStore from '../store/themeStore';
+import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -68,8 +69,9 @@ export default function Navbar() {
               className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full pr-2 pl-1 py-1 transition-colors"
             >
               <img
-                src={user?.avatar_img}
+                src={getAvatarUrl(user?.avatar_img, user?.name)}
                 alt={user?.name}
+                onError={(e) => handleAvatarError(e, user?.name)}
                 className="w-8 h-8 rounded-full border-2 border-indigo-500/30 object-cover bg-gray-200"
               />
               <span className="text-sm font-medium text-gray-800 dark:text-gray-200 hidden sm:block max-w-24 truncate">{user?.name}</span>

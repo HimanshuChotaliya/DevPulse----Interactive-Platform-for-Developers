@@ -11,6 +11,7 @@ import LoadingSkeleton from '../components/LoadingSkeleton';
 import api from '../api/axios.js';
 import useAuthStore from '../store/authStore';
 import usePostStore from '../store/postStore';
+import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
 const GET_POST_DETAIL = gql`
   query GetPostDetail($id: ID!) {
@@ -201,11 +202,12 @@ export default function PostDetail() {
 
         {/* Comment input */}
         <form onSubmit={handleAddComment} className="mt-4 flex gap-3 items-start">
-          <img
-            src={user?.avatar_img || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'}
-            alt={user?.name}
-            className="w-9 h-9 rounded-full object-cover bg-gray-200 flex-shrink-0"
-          />
+            <img
+              src={getAvatarUrl(user?.avatar_img, user?.name)}
+              alt={user?.name}
+              onError={(e) => handleAvatarError(e, user?.name)}
+              className="w-9 h-9 rounded-full object-cover bg-gray-200 flex-shrink-0"
+            />
           <div className="flex-1 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden focus-within:border-indigo-400 dark:focus-within:border-indigo-600 transition-colors">
             <textarea
               value={commentText}

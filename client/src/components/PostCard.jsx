@@ -10,6 +10,7 @@ import TypeBadge from './TypeBadge';
 import PresenceDot from './PresenceDot';
 import api from '../api/axios.js';
 import toast from 'react-hot-toast';
+import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
 export default function PostCard({ post, compact = false }) {
   const user = useAuthStore((s) => s.user);
@@ -107,8 +108,9 @@ export default function PostCard({ post, compact = false }) {
           <div className="flex items-start gap-3">
             <Link to={`/profile/${authorId}`} className="relative">
               <img
-                src={author.avatar_img || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'}
+                src={getAvatarUrl(author.avatar_img, author.name)}
                 alt={author.name}
+                onError={(e) => handleAvatarError(e, author.name)}
                 className="w-10 h-10 rounded-full border-2 border-gray-100 dark:border-gray-800 object-cover bg-gray-200 flex-shrink-0 hover:ring-2 hover:ring-indigo-400 transition"
               />
               <div className="absolute bottom-0 right-0 transform translate-x-0.5 translate-y-0.5">
