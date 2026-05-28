@@ -11,8 +11,8 @@ import api from '../api/axios.js';
 import toast from 'react-hot-toast';
 import { getAvatarUrl, handleAvatarError } from '../utils/avatar.js';
 
-const FILTER_TABS = ['All', 'Updates', 'Questions', 'Decisions', 'Blockers'];
-const FILTER_MAP = { All: null, Updates: 'update', Questions: 'question', Decisions: 'decision', Blockers: 'blocker' };
+const FILTER_TABS = ['All', 'Updates', 'Questions', 'Decisions', 'Milestones'];
+const FILTER_MAP = { All: null, Updates: 'update', Questions: 'question', Decisions: 'decision', Milestones: 'milestone' };
 const ROLE_OPTIONS = ['Developer', 'Designer', 'Manager', 'DevOps', 'QA', 'Product'];
 
 const ROLE_COLORS = {
