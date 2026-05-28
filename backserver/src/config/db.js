@@ -10,7 +10,7 @@ const pool = new Pool(
     process.env.DATABASE_URL
         ? {
             connectionString: process.env.DATABASE_URL,
-            ssl: isInternalRailway ? false : { rejectUnauthorized: false }
+            ssl: { rejectUnauthorized: false }
         }
         : {
             host: process.env.DB_HOST || "localhost",
